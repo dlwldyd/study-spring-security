@@ -1,0 +1,5 @@
+spring:
+  security:
+    user:
+      name: temp #스프링 시큐리티에서 기본으로 주어지는 아이디 지정
+      password: 1 #스프링 시큐리티에서 기본으로 주어지는 아이디의 비밀번호 지정
