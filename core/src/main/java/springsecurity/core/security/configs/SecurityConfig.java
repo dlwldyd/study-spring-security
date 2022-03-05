@@ -13,6 +13,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import springsecurity.core.security.provider.CustomAuthenticationProvider;
 
 @Configuration
@@ -22,6 +23,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final UserDetailsService userDetailsService;
     private final AuthenticationDetailsSource authenticationDetailsSource;
+    private final AuthenticationSuccessHandler authenticationSuccessHandler;
 
     //PasswordEncoder 스프링 빈으로 등록
     @Bean
@@ -58,9 +60,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
                 .and().formLogin()
                 .loginPage("/login")
-                .defaultSuccessUrl("/")
+//                .defaultSuccessUrl("/")
                 .loginProcessingUrl("/login_proc")
                 .authenticationDetailsSource(authenticationDetailsSource) //직접 만든 AuthenticationDetailsSource 등록
+                .successHandler(authenticationSuccessHandler)
                 .permitAll();
     }
 
