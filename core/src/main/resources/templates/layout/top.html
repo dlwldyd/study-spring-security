@@ -1,10 +1,16 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<!--타임리프에서 제공하는 스프링 시큐리티 관련 표현식을 쓰기 위해 xmlns 추가-->
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <div th:fragment="header">
     <nav class="navbar navbar-dark sticky-top bg-dark ">
         <div class="container">
             <a class="text-light" href="#"><h4>Core Spring Security</h4></a>
             <ul class="nav justify-content-end">
+<!--
+                sec: -> 타임리프에서 제공하는 스프링 시큐리티 관련 표현식을 사용할 수 있음
+                sec:authorize="isAnonymous()" -> anonymous 사용자일 때 렌더링 됨
+                sec:authorize="isAuthenticated()" -> 인증된 사용자일 때 렌더링 됨
+-->
                 <li class="nav-item" sec:authorize="isAnonymous()" ><a class="nav-link text-light" th:href="@{/login}">로그인</a></li>
                 <li class="nav-item" sec:authorize="isAnonymous()"><a class="nav-link text-light" th:href="@{/users}">회원가입</a></li>
                 <li class="nav-item" sec:authorize="isAuthenticated()"><a class="nav-link text-light" th:href="@{/logout}">로그아웃</a></li>

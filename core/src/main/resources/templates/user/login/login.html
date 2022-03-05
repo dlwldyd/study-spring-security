@@ -13,6 +13,7 @@
                 <span th:text="${exception}" class="alert alert-danger">잘못된 아이디나 암호입니다</span>
             </div>
             <form th:action="@{/login_proc}" class="form-signin" method="post">
+<!--                커스텀 AuthenticationDetails 에서 인증처리를 위한 추가적인 필드를 히든 필드로 전달했음-->
                 <input type="hidden" th:value="secret" name="secret_key" />
                 <div class="form-group">
                     <input type="text" class="form-control" name="username" placeholder="아이디" required="required" autofocus="autofocus">

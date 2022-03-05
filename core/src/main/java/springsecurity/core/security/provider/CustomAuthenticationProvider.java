@@ -3,12 +3,14 @@ package springsecurity.core.security.provider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import springsecurity.core.security.common.FormWebAuthenticationDetails;
 import springsecurity.core.security.service.AccountContext;
 
 @RequiredArgsConstructor
@@ -28,6 +30,16 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
 
         if (!passwordEncoder.matches(password, accountContext.getPassword())) {
             throw new BadCredentialsException("BadCredentialsException");
+        }
+
+        /*
+        뷰에서 히든 필드로 secretKey 라는 파라미터로 "secret"이라는 문자열을 넘기는데 만약 secretKey 라는 파라미터에
+        "secret"이라는 문자열이 없으면 예외를 발생시킴
+         */
+        FormWebAuthenticationDetails details = (FormWebAuthenticationDetails) authentication.getDetails();
+        String secretKey = details.getSecretKey();
+        if (secretKey == null || !secretKey.equals("secret")) {
+            throw new InsufficientAuthenticationException("InsufficientAuthenticationException");
         }
 
         //인자가 2개인(권한 정보X) 생정자는 로그인 시도 시 사용되는 생성자이다.
