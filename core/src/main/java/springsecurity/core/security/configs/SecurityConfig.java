@@ -13,8 +13,10 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import springsecurity.core.security.handler.CustomAccessDeniedHandler;
 import springsecurity.core.security.provider.CustomAuthenticationProvider;
 
 @Configuration
@@ -36,6 +38,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public CustomAuthenticationProvider customAuthenticationProvider() {
         return new CustomAuthenticationProvider(userDetailsService, passwordEncoder());
+    }
+
+    @Bean
+    public AccessDeniedHandler accessDeniedHandler() {
+        CustomAccessDeniedHandler accessDeniedHandler = new CustomAccessDeniedHandler();
+        accessDeniedHandler.setErrorPage("/denied");
+        return accessDeniedHandler;
     }
 
     @Override
@@ -62,9 +71,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/mypage").hasRole("USER")
                 .antMatchers("/messages").hasRole("MANAGER")
                 .antMatchers("config").hasRole("ADMIN")
-                .anyRequest().authenticated()
+                .anyRequest().authenticated();
 
-                .and().formLogin()
+        http.formLogin()
                 .loginPage("/login")
 //                .defaultSuccessUrl("/")
                 .loginProcessingUrl("/login_proc")
@@ -72,6 +81,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .successHandler(authenticationSuccessHandler)
                 .failureHandler(authenticationFailureHandler)
                 .permitAll();
+
+        http.exceptionHandling()
+                .accessDeniedHandler(accessDeniedHandler()); //권한이 없는 리소스에 접근했을 때(인가 예외가 발생했을 때) 사용되는 핸들러
     }
 
     //보안 예외처리
