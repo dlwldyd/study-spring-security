@@ -13,6 +13,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import springsecurity.core.security.provider.CustomAuthenticationProvider;
 
@@ -24,6 +25,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final UserDetailsService userDetailsService;
     private final AuthenticationDetailsSource authenticationDetailsSource;
     private final AuthenticationSuccessHandler authenticationSuccessHandler;
+    private final AuthenticationFailureHandler authenticationFailureHandler;
 
     //PasswordEncoder 스프링 빈으로 등록
     @Bean
@@ -52,7 +54,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
-                .antMatchers("/", "/users").permitAll()
+                /*
+                loginPage("/login").permitAll()은 파라미터가 붙지 않은 "/login"만 모든 사용자가 접근 가능하다.
+                로그인 에러를 파라미터의 형태로 로그인 페이지에 전달하기 위해서는 "/login*"도 모든 사용자의 접근을 허용해야 한다.
+                 */
+                .antMatchers("/", "/users", "/login*").permitAll()
                 .antMatchers("/mypage").hasRole("USER")
                 .antMatchers("/messages").hasRole("MANAGER")
                 .antMatchers("config").hasRole("ADMIN")
@@ -64,6 +70,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .loginProcessingUrl("/login_proc")
                 .authenticationDetailsSource(authenticationDetailsSource) //직접 만든 AuthenticationDetailsSource 등록
                 .successHandler(authenticationSuccessHandler)
+                .failureHandler(authenticationFailureHandler)
                 .permitAll();
     }
 

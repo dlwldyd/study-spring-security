@@ -21,6 +21,7 @@ public class CustomAuthenticationHandler extends SimpleUrlAuthenticationSuccessH
     //session 에 savedRequest 를 저장하고 가져오는 역할을 하는 객체
     private RequestCache requestCache = new HttpSessionRequestCache();
 
+    //response.sendRedirect()를 통해 리다이렉트 할 수도 있겠지만 이거를 사용하는 편이 더 좋다.
     private RedirectStrategy redirectStrategy = new DefaultRedirectStrategy();
 
     @Override

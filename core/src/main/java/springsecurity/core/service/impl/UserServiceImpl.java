@@ -9,12 +9,13 @@ import springsecurity.core.service.UserService;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
 
-    @Transactional
     @Override
+    @Transactional
     public void createUser(Account account) {
         userRepository.save(account);
     }

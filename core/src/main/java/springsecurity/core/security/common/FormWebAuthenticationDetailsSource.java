@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 import javax.servlet.http.HttpServletRequest;
 
 //FormWebAuthenticationDetails 를 생성하는 클래스
-//<context, return> -> context : FormWebAuthenticationDetails 생성자의 파라미터로 들어갈 타입, return : 반환 타입
+//<context, return> -> context : buildDetails 메서드의 파라미터로 들어갈 타입, return : 반환 타입
 @Component
 public class FormWebAuthenticationDetailsSource implements AuthenticationDetailsSource<HttpServletRequest, WebAuthenticationDetails> {
 
