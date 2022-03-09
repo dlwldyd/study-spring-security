@@ -1,6 +1,9 @@
 package springsecurity.core.security.handler;
 
+import org.springframework.context.annotation.Primary;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.CredentialsExpiredException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
@@ -12,6 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @Component
+@Primary
 public class CustomAuthenticationFailureHandler extends SimpleUrlAuthenticationFailureHandler {
 
     @Override
@@ -22,6 +26,10 @@ public class CustomAuthenticationFailureHandler extends SimpleUrlAuthenticationF
 
         if (exception instanceof InsufficientAuthenticationException) {
             errorMessage = "Invalid Secret Key"; //히든필드로 넘긴 secretKey 값이 "secret_key"가 아닐 때
+        } else if (exception instanceof DisabledException) {
+            errorMessage = "Locked";
+        } else if (exception instanceof CredentialsExpiredException) {
+            errorMessage = "Expired Password";
         }
 
         setDefaultFailureUrl("/login?error=true&exception=" + errorMessage);

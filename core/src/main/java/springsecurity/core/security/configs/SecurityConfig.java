@@ -4,7 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationDetailsSource;
+import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
@@ -22,6 +24,7 @@ import springsecurity.core.security.provider.CustomAuthenticationProvider;
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
+@Order(1)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final UserDetailsService userDetailsService;
@@ -36,7 +39,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
-    public CustomAuthenticationProvider customAuthenticationProvider() {
+    public AuthenticationProvider customAuthenticationProvider() {
         return new CustomAuthenticationProvider(userDetailsService, passwordEncoder());
     }
 
@@ -67,7 +70,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 loginPage("/login").permitAll()은 파라미터가 붙지 않은 "/login"만 모든 사용자가 접근 가능하다.
                 로그인 에러를 파라미터의 형태로 로그인 페이지에 전달하기 위해서는 "/login*"도 모든 사용자의 접근을 허용해야 한다.
                  */
-                .antMatchers("/", "/users", "/login*").permitAll()
+                .antMatchers("/", "/users", "/login*", "/api/login").permitAll()
                 .antMatchers("/mypage").hasRole("USER")
                 .antMatchers("/messages").hasRole("MANAGER")
                 .antMatchers("config").hasRole("ADMIN")
@@ -84,6 +87,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
         http.exceptionHandling()
                 .accessDeniedHandler(accessDeniedHandler()); //권한이 없는 리소스에 접근했을 때(인가 예외가 발생했을 때) 사용되는 핸들러
+
     }
 
     //보안 예외처리

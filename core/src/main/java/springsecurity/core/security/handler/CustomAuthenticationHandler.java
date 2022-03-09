@@ -1,5 +1,6 @@
 package springsecurity.core.security.handler;
 
+import org.springframework.context.annotation.Primary;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.DefaultRedirectStrategy;
 import org.springframework.security.web.RedirectStrategy;
@@ -16,6 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @Component
+@Primary
 public class CustomAuthenticationHandler extends SimpleUrlAuthenticationSuccessHandler {
 
     //session 에 savedRequest 를 저장하고 가져오는 역할을 하는 객체
