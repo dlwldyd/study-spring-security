@@ -6,11 +6,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import springsecurity.core.domain.Account;
-import springsecurity.core.domain.AccountDto;
+import springsecurity.core.security.configs.dto.AccountDto;
 import springsecurity.core.service.UserService;
-
-import static springsecurity.core.domain.Account.*;
 
 @Controller
 @RequiredArgsConstructor
@@ -32,7 +29,7 @@ public class UserController {
 
 	@PostMapping("/users")
 	public String createUser(AccountDto accountDto) {
-		userService.createUser(convertDtoToAccount(accountDto, passwordEncoder));
+		userService.createUser(accountDto.createAccount(passwordEncoder));
 		return "redirect:/";
 	}
 }

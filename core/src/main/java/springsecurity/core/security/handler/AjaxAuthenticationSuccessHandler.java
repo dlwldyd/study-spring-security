@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
-import springsecurity.core.domain.Account;
+import springsecurity.core.domain.entity.Account;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -22,6 +22,6 @@ public class AjaxAuthenticationSuccessHandler implements AuthenticationSuccessHa
         response.setStatus(HttpServletResponse.SC_OK);
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
 
-        objectMapper.writeValue(response.getWriter(), account);
+        objectMapper.writeValue(response.getWriter(), new Account(account));
     }
 }

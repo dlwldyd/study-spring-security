@@ -5,7 +5,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-import springsecurity.core.domain.AccountDto;
+import springsecurity.core.security.configs.dto.AccountDto;
 import springsecurity.core.security.token.AjaxAuthenticationToken;
 
 import javax.servlet.ServletException;

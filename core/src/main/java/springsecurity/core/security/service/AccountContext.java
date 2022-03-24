@@ -3,7 +3,7 @@ package springsecurity.core.security.service;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
-import springsecurity.core.domain.Account;
+import springsecurity.core.domain.entity.Account;
 
 import java.util.Collection;
 
