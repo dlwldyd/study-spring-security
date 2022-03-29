@@ -9,8 +9,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import springsecurity.core.domain.entity.*;
 import springsecurity.core.repository.*;
+import springsecurity.core.security.metadatasource.UrlFilterInvocationSecurityMetadataSource;
 
-import javax.persistence.EntityManager;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Component
@@ -30,6 +30,8 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
     private final ResourcesRoleRepository resourcesRoleRepository;
 
     private final PasswordEncoder passwordEncoder;
+
+    private final UrlFilterInvocationSecurityMetadataSource urlFilterInvocationSecurityMetadataSource;
 
     private static AtomicInteger count = new AtomicInteger(0);
 
@@ -76,6 +78,8 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
 //        roles3.add(childRole1);
 //        createResourceIfNotFound("/users/**", "", roles3, "url");
 //        createUserIfNotFound("user", "pass", "user@gmail.com", 30, roles3);
+
+        urlFilterInvocationSecurityMetadataSource.reload();
 
     }
 
