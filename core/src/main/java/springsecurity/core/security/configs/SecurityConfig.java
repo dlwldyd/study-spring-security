@@ -7,7 +7,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.access.AccessDecisionManager;
 import org.springframework.security.access.AccessDecisionVoter;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.access.vote.AffirmativeBased;
+import org.springframework.security.access.vote.RoleHierarchyVoter;
 import org.springframework.security.access.vote.RoleVoter;
 import org.springframework.security.authentication.AuthenticationDetailsSource;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -25,11 +28,13 @@ import org.springframework.security.web.access.intercept.FilterSecurityIntercept
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import springsecurity.core.security.factory.UrlResourcesMapFactoryBean;
+import springsecurity.core.security.filter.PermitAllFilter;
 import springsecurity.core.security.handler.CustomAccessDeniedHandler;
 import springsecurity.core.security.metadatasource.UrlFilterInvocationSecurityMetadataSource;
 import springsecurity.core.security.provider.CustomAuthenticationProvider;
 import springsecurity.core.service.SecurityResourceService;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -45,6 +50,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final AuthenticationSuccessHandler authenticationSuccessHandler;
     private final AuthenticationFailureHandler authenticationFailureHandler;
     private final SecurityResourceService securityResourceService;
+    private String[] permitAllResources = {"/", "/login", "/user/login/**"};
 
     //PasswordEncoder 스프링 빈으로 등록
     @Bean
@@ -80,8 +86,21 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return new AffirmativeBased(getAccessDecisionVoters());
     }
 
+    @Bean
+    public AccessDecisionVoter<? extends Object> roleVoter() {
+        return new RoleHierarchyVoter(roleHierarchy());
+    }
+
+    @Bean
+    public RoleHierarchyImpl roleHierarchy() {
+        return new RoleHierarchyImpl();
+    }
+
     private List<AccessDecisionVoter<?>> getAccessDecisionVoters() {
-        return List.of(new RoleVoter());
+
+        List<AccessDecisionVoter<? extends Object>> accessDecisionVoters = new ArrayList<>();
+        accessDecisionVoters.add(roleVoter());
+        return accessDecisionVoters;
     }
 
     /*
@@ -91,7 +110,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
      */
     @Bean
     public FilterSecurityInterceptor customFilterSecurityInterceptor() throws Exception {
-        FilterSecurityInterceptor filterSecurityInterceptor = new FilterSecurityInterceptor();
+        FilterSecurityInterceptor filterSecurityInterceptor = new PermitAllFilter(permitAllResources);
         filterSecurityInterceptor.setSecurityMetadataSource(urlFilterInvocationSecurityMetadataSource());
         filterSecurityInterceptor.setAccessDecisionManager(accessDecisionManager());
         filterSecurityInterceptor.setAuthenticationManager(authenticationManagerBean());

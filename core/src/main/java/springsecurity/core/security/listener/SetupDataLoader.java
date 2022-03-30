@@ -33,6 +33,8 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
 
     private final UrlFilterInvocationSecurityMetadataSource urlFilterInvocationSecurityMetadataSource;
 
+    private final RoleHierarchyRepository roleHierarchyRepository;
+
     private static AtomicInteger count = new AtomicInteger(0);
 
     @Override
@@ -49,19 +51,49 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
 
     @Transactional
     private void setupSecurityResources() {
-        Account account = createUserIfNotFound("admin", "admin", "admin@gmail.com", 10);
-        Role adminRole = createRoleIfNotFound("ROLE_ADMIN", "관리자");
-        Resources resources = createResourceIfNotFound("/admin/**", "", "url");
+        Account admin = createUserIfNotFound("admin", "admin", "admin@gmail.com", 30);
+        Account manager = createUserIfNotFound("manager", "manager", "manager@gmail.com", 20);
+        Account user = createUserIfNotFound("user", "user", "user@gmail.com", 10);
+        Role adminRole = createRoleIfNotFound("ROLE_ADMIN", "어드민");
+        Role managerRole = createRoleIfNotFound("ROLE_MANAGER", "관리자");
+        Role userRole = createRoleIfNotFound("ROLE_USER", "사용자");
+        Resources adminResource = createResourceIfNotFound("/admin/**", "", "url");
+        Resources adminResource2 = createResourceIfNotFound("/config", "", "url");
+        Resources managerResource = createResourceIfNotFound("/messages", "", "url");
+        Resources userResource = createResourceIfNotFound("/mypage", "", "url");
 
-        save(account, adminRole, resources);
 
-        AccountRole accountRole = new AccountRole(account, adminRole);
-        ResourcesRole resourcesRole = new ResourcesRole(resources, adminRole);
+        save(admin, adminRole, adminResource);
+        save(manager, managerRole, managerResource);
+        save(user, userRole, userResource);
+        save(adminResource2);
 
-        save(accountRole, resourcesRole);
+        AccountRole adminAccountRole = new AccountRole(admin, adminRole);
+        ResourcesRole adminResourcesRole = new ResourcesRole(adminResource, adminRole);
+        ResourcesRole adminResourcesRole2 = new ResourcesRole(adminResource2, adminRole);
 
-        account.getUserRoles().add(accountRole);
-        resources.getRoleSet().add(resourcesRole);
+        AccountRole managerAccountRole = new AccountRole(manager, managerRole);
+        ResourcesRole managerResourcesRole = new ResourcesRole(managerResource, managerRole);
+
+        AccountRole userAccountRole = new AccountRole(user, userRole);
+        ResourcesRole userResourcesRole = new ResourcesRole(userResource, userRole);
+
+        save(adminAccountRole, adminResourcesRole);
+        save(managerAccountRole, managerResourcesRole);
+        save(userAccountRole, userResourcesRole);
+        save(adminResourcesRole2);
+
+        admin.getUserRoles().add(adminAccountRole);
+        adminResource.getRoleSet().add(adminResourcesRole);
+
+        manager.getUserRoles().add(managerAccountRole);
+        managerResource.getRoleSet().add(managerResourcesRole);
+
+        user.getUserRoles().add(userAccountRole);
+        userResource.getRoleSet().add(userResourcesRole);
+
+        createRoleHierarchyIfNotFound(managerRole, adminRole);
+        createRoleHierarchyIfNotFound(userRole, managerRole);
 
 //        Set<Role> roles1 = new HashSet<>();
 //
@@ -88,9 +120,17 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
         resourcesRoleRepository.save(resourcesRole);
     }
 
+    private void save(ResourcesRole resourcesRole) {
+        resourcesRoleRepository.save(resourcesRole);
+    }
+
     private void save(Account account, Role role, Resources resources) {
         userRepository.save(account);
         roleRepository.save(role);
+        resourcesRepository.save(resources);
+    }
+
+    private void save(Resources resources) {
         resourcesRepository.save(resources);
     }
 
@@ -105,6 +145,21 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
                     .build();
         }
         return role;
+    }
+
+    private void createRoleHierarchyIfNotFound(Role childRole, Role parentRole) {
+
+        RoleHierarchy parentRoleHierarchy = roleHierarchyRepository.findByChildName(parentRole.getRoleName());
+        if (parentRoleHierarchy == null) {
+            parentRoleHierarchy = new RoleHierarchy(parentRole.getRoleName());
+            roleHierarchyRepository.save(parentRoleHierarchy);
+        }
+
+        RoleHierarchy childRoleHierarchy = roleHierarchyRepository.findByChildName(childRole.getRoleName());
+        if (childRoleHierarchy == null) {
+            childRoleHierarchy = new RoleHierarchy(childRole.getRoleName(), parentRoleHierarchy);
+            roleHierarchyRepository.save(childRoleHierarchy);
+        }
     }
 
     private Account createUserIfNotFound(String userName, String password, String email, int age) {
