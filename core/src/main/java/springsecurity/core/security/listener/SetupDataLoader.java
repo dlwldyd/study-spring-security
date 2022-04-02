@@ -35,6 +35,8 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
 
     private final RoleHierarchyRepository roleHierarchyRepository;
 
+    private final AccessIpRepository accessIpRepository;
+
     private static AtomicInteger count = new AtomicInteger(0);
 
     @Override
@@ -94,6 +96,9 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
 
         createRoleHierarchyIfNotFound(managerRole, adminRole);
         createRoleHierarchyIfNotFound(userRole, managerRole);
+
+        setupAccessIpData("127.0.0.1");
+        setupAccessIpData("0:0:0:0:0:0:0:1");
 
 //        Set<Role> roles1 = new HashSet<>();
 //
@@ -189,5 +194,13 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
                     .build();
         }
         return resources;
+    }
+
+    private void setupAccessIpData(String ip) {
+        AccessIp ipAddress = accessIpRepository.findByIpAddress(ip);
+        if (ipAddress == null) {
+            ipAddress = new AccessIp(ip);
+            accessIpRepository.save(ipAddress);
+        }
     }
 }

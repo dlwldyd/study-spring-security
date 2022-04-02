@@ -32,6 +32,7 @@ import springsecurity.core.security.filter.PermitAllFilter;
 import springsecurity.core.security.handler.CustomAccessDeniedHandler;
 import springsecurity.core.security.metadatasource.UrlFilterInvocationSecurityMetadataSource;
 import springsecurity.core.security.provider.CustomAuthenticationProvider;
+import springsecurity.core.security.voter.IpAddressVoter;
 import springsecurity.core.service.SecurityResourceService;
 
 import java.util.ArrayList;
@@ -99,6 +100,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private List<AccessDecisionVoter<?>> getAccessDecisionVoters() {
 
         List<AccessDecisionVoter<? extends Object>> accessDecisionVoters = new ArrayList<>();
+        //voter 를 추가할 때의 순서에 따라 결과가 달리질 수 있기 때문에 voter 의 추가 순서도 잘 생각해서 정해야한다.
+        accessDecisionVoters.add(new IpAddressVoter(securityResourceService));
         accessDecisionVoters.add(roleVoter());
         return accessDecisionVoters;
     }
